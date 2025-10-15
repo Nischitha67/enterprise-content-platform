@@ -1,4 +1,4 @@
-package com.example.enterprise_content_platform;
+package com.example.content;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

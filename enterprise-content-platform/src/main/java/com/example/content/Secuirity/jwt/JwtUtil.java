@@ -1,4 +1,4 @@
-package com.example.enterprise_content_platform.Secuirity.jwt;
+package com.example.content.Secuirity.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private final String SECRET_KEY = "your-secret-key-your-secret-key"; // 32+ chars
+    private final String SECRET_KEY = "ZHVtbXktc3VwZXItc2VjdXJlLXNlY3JldC1rZXktaW4tYmFzZTY0"; // 32+ chars
     private final long EXPIRATION = 1000 * 60 * 60; // 1 hr
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
