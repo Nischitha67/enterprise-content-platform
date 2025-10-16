@@ -4,6 +4,8 @@ import com.example.content.model.Document;
 import com.example.content.model.DocumentVersion;
 import com.example.content.repository.DocumentRepository;
 import com.example.content.repository.DocumentVersionRepository;
+import com.example.content.mapper.DocumentMapper;
+import com.example.content.elasticsearch.SearchDocument;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,8 +16,9 @@ import java.util.Optional;
 
 @Service
 public class DocumentService {
+
     private final DocumentVersionRepository versionRepository;
-    
+
     @Autowired
     private DocumentRepository documentRepository;
 
@@ -32,7 +35,8 @@ public class DocumentService {
     }
 
     public Document update(Long id, Document update) {
-        Document existing = documentRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found"));
+        Document existing = documentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Not found"));
         existing.setTitle(update.getTitle());
         existing.setContentUrl(update.getContentUrl());
         existing.setTags(update.getTags());
@@ -50,10 +54,14 @@ public class DocumentService {
         v.setFileUrl(fileUrl);
         return versionRepository.save(v);
     }
-    
+
     public Document uploadDocument(Document document) {
         Document saved = documentRepository.save(document);
-        searchService.indexDocument(saved);
+
+        // Convert JPA Document -> SearchDocument before indexing
+        SearchDocument searchDoc = DocumentMapper.toSearchDocument(saved);
+        searchService.indexDocument(searchDoc);
+
         return saved;
     }
 
@@ -71,6 +79,7 @@ public class DocumentService {
     }
 
     public List<Document> search(String keyword) {
-        return searchService.searchByTitleOrTags(keyword);
+        // Convert Elasticsearch result -> JPA Document list
+        return DocumentMapper.toDocumentList(searchService.searchByTitleOrTags(keyword));
     }
 }

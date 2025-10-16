@@ -7,7 +7,7 @@ import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.stereotype.Service;
 
-import com.example.content.model.Document;
+import com.example.content.elasticsearch.SearchDocument;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,23 +22,24 @@ public class SearchService {
         this.elasticsearchTemplate = elasticsearchTemplate;
     }
 
-    public List<Document> searchByTitleOrTags(String keyword) {
+    public List<SearchDocument> searchByTitleOrTags(String keyword) {
         Criteria criteria = new Criteria("title").matches(keyword)
                 .or(new Criteria("tags").matches(keyword));
-        CriteriaQuery query = new CriteriaQuery(criteria);
 
-        SearchHits<Document> hits = elasticsearchTemplate.search(query, Document.class);
+        CriteriaQuery query = new CriteriaQuery(criteria);
+        SearchHits<SearchDocument> hits = elasticsearchTemplate.search(query, SearchDocument.class);
+
         return hits.getSearchHits()
-                   .stream()
-                   .map(hit -> hit.getContent())
-                   .collect(Collectors.toList());
+                .stream()
+                .map(hit -> hit.getContent())
+                .collect(Collectors.toList());
     }
 
-    public void indexDocument(Document document) {
+    public void indexDocument(SearchDocument document) {
         elasticsearchTemplate.save(document);
     }
 
     public void deleteDocument(String documentId) {
-        elasticsearchTemplate.delete(documentId, Document.class);
+        elasticsearchTemplate.delete(documentId, SearchDocument.class);
     }
 }
